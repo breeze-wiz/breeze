@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>进制转换工具</title>
+</head>
+<body>
+
+  <h1>进制转换工具</h1>
+
+  <label for="inputNumber">输入数字：</label>
+  <input type="text" id="inputNumber" placeholder="输入数字">
+  <br><br>
+
+  <label for="fromBase">选择输入进制：</label>
+  <select id="fromBase">
+    <option value="2">二进制</option>
+    <option value="3">三进制</option>
+    <option value="4">四进制</option>
+    <option value="8">八进制</option>
+    <option value="10">十进制</option>
+    <option value="16">十六进制</option>
+    <option value="36">三十六进制</option>
+    <option value="64">六十四进制</option>
+  </select>
+  <br><br>
+
+  <label for="toBase">选择转换进制：</label>
+  <select id="toBase">
+    <option value="2">二进制</option>
+    <option value="3">三进制</option>
+    <option value="4">四进制</option>
+    <option value="8">八进制</option>
+    <option value="10">十进制</option>
+    <option value="16">十六进制</option>
+    <option value="36">三十六进制</option>
+    <option value="64">六十四进制</option>
+  </select>
+  <br><br>
+
+  <button onclick="convert()">转换</button>
+  <br><br>
+
+  <h2>转换结果：</h2>
+  <p id="result">请输入数字和选择进制进行转换。</p>
+
+  <script>
+    function convert() {
+      // 获取用户输入的数字和选择的进制
+      var inputNumber = document.getElementById('inputNumber').value;
+      var fromBase = parseInt(document.getElementById('fromBase').value);
+      var toBase = parseInt(document.getElementById('toBase').value);
+
+      // 判断输入是否为空
+      if (!inputNumber) {
+        document.getElementById('result').textContent = "请输入一个有效的数字！";
+        return;
+      }
+
+      // 检查输入的数字是否符合所选进制
+      if (!isValidForBase(inputNumber, fromBase)) {
+        document.getElementById('result').textContent = `输入的数字 ${inputNumber} 对应进制 ${fromBase} 无效！`;
+        return;
+      }
+
+      // 使用 parseInt 将输入的数字从指定进制转换为十进制
+      var decimalValue = parseInt(inputNumber, fromBase);
+
+      // 判断是否转换成功
+      if (isNaN(decimalValue)) {
+        document.getElementById('result').textContent = "无法将输入的数字转换为指定进制的十进制数。";
+        return;
+      }
+
+      // 根据目标进制将十进制数转换为目标进制
+      var result;
+      switch (toBase) {
+        case 2:
+          result = decimalValue.toString(2);  // 转换为二进制
+          break;
+        case 3:
+          result = decimalValue.toString(3);  // 转换为三进制
+          break;
+        case 4:
+          result = decimalValue.toString(4);  // 转换为四进制
+          break;
+        case 8:
+          result = decimalValue.toString(8);  // 转换为八进制
+          break;
+        case 10:
+          result = decimalValue.toString(10);  // 转换为十进制
+          break;
+        case 16:
+          result = decimalValue.toString(16);  // 转换为十六进制
+          break;
+        case 36:
+          result = decimalValue.toString(36);  // 转换为三十六进制
+          break;
+        case 64:
+          result = toBase64(decimalValue);  // 转换为六十四进制
+          break;
+        default:
+          result = "错误的目标进制。";
+          break;
+      }
+
+      // 显示转换结果
+      document.getElementById('result').textContent = `结果：${result}（${toBase}进制）`;
+    }
+
+    // 自定义转换函数，用于将十进制数转换为64进制
+    function toBase64(decimalValue) {
+      var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
+      var base64 = '';
+      while (decimalValue > 0) {
+        base64 = chars[decimalValue % 64] + base64;
+        decimalValue = Math.floor(decimalValue / 64);
+      }
+      return base64 || '0';  // 如果是0，返回'0'
+    }
+
+    // 检查输入的数字是否符合所选进制
+    function isValidForBase(input, base) {
+      var validChars = '';
+      
+      // 根据所选进制，构建有效字符集
+      if (base <= 10) {
+        validChars = '0123456789'.slice(0, base);  // 比如三进制就只有0,1,2
+      } else if (base <= 36) {
+        validChars = '0123456789abcdefghijklmnopqrstuvwxyz'.slice(0, base);  // 十六进制及以下
+      } else if (base == 64) {
+        validChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/';  // Base64 字符集
+      }
+
+      // 检查输入的每个字符是否都属于有效字符集
+      for (var i = 0; i < input.length; i++) {
+        if (validChars.indexOf(input[i].toLowerCase()) === -1) {
+          return false;  // 如果某个字符不在有效字符集里，返回 false
+        }
+      }
+      return true;  // 所有字符都合法
+    }
+  </script>
+
+</body>
+</html>
